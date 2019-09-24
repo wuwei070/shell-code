@@ -1,0 +1,2 @@
+cat /dev/null > messages  #清空一个文件
+exit # 这个命令是一种正确并且合适的退出脚本的方法.

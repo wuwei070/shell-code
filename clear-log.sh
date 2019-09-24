@@ -29,7 +29,7 @@ if [ -n "$1" ]
 then
   lines=$1
 else  
-  lines=$LINES # 默认,如果不在命令行中指定.
+  lines=$LINES # 默认,如果不在命令行中指定.这种给个默认值也挺好，适合新手运行脚本
 fi  
 
 
