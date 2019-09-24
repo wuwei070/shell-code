@@ -1,2 +1,4 @@
 cat /dev/null > messages  #清空一个文件
 exit # 这个命令是一种正确并且合适的退出脚本的方法.
+再次提醒你#!/bin/sh将会调用默认的shell解释器, 在Linux机器上默认是/bin/bash.写这个可以容易的移植到non-linux机器上
+小心: 使用sh scriptname来调用脚本的时候将会关闭一些Bash特定的扩展, 脚本可能因此而调用失败.
