@@ -2,3 +2,65 @@ cat /dev/null > messages  #清空一个文件
 exit # 这个命令是一种正确并且合适的退出脚本的方法.
 再次提醒你#!/bin/sh将会调用默认的shell解释器, 在Linux机器上默认是/bin/bash.写这个可以容易的移植到non-linux机器上
 小心: 使用sh scriptname来调用脚本的时候将会关闭一些Bash特定的扩展, 脚本可能因此而调用失败.
+echo $(( 2#101011 ))  #数制转换
+
+逗号操作符. 逗号操作符链接了一系列的算术操作. 虽然里边所有的内容都被运行了,但只有最后一项被返回.
+    1 let "t2 = ((a = 9, 15 / 3))"  # Set "a = 9" and "t2 = 15 / 3"
+空命令[冒号, 即:]. 等价于"NOP" (no op, 一个什么也不干的命令). 也可以被认为与shell的内建命令true作用相同. ":"命令是一个bash的内建命令, 它的退出码(exit status)是"true"(0).
+
+4. : ${username=`whoami`}
+  2 # ${username=`whoami`}   如果没有开头的":"的话, 将会给出一个错误, 
+  3 #                        除非"username"是一个命令或者内建命令...
+
+$
+行结束符. 在正则表达式中, "$"表示行结束符.
+
+${}
+参数替换.
+
+$*, $@
+位置参数.
+
+$?
+退出状态码变量. $? 变量 保存了一个命令, 一个函数, 或者是脚本本身的退出状态码.
+
+$$
+进程ID变量. 这个$$ 变量 保存了它所在脚本的进程 ID [1]
+
+初始化数组.
+
+  1 Array=(element1 element2 element3)
+
+大括号扩展 {xxx,yyy,zzz,...}
+    cat {file1,file2,file3} > combined_file
+    cp file22.{txt,backup}
+    echo {file1,file2}\ :{\ A," B",' C'}  #在大括号中, 不允许有空白, 除非这个空白被引用或转义.  file1 : A file1 : B file1 : C file2 : A file2 : B file2 : C
+
+a=123
+( a=321; )	      
+echo "a = $a"   # a = 123   # 在圆括号中a变量, 更像是一个局部变量. 
+小括号和大括号的区别。同时， {大括号}中的代码块将不会开启一个新的子shell.
+a=123
+{ a=321; }
+echo "a = $a"   # a = 321   (说明在代码块中对变量a所作的修改, 影响了外边的变量)
+
+{} \; 一般都在find命令中使用. 这不是一个shell内建命令. ";"用来结束find命令序列的-exec选项. 它需要被保护以防止被shell所解释.
+
+command &>filename 重定向command的stdout和stderr到filename中.
+command >&2 重定向command的stdout到stderr中.
+
+[root@localhost tmp]# grep '\<the\>' 1.txt  #匹配行首的the  正则表达式中的单词边界 
+the asdfthe
+[root@localhost tmp]# grep the 1.txt  #匹配这行的所有the
+the asdfthe
+
+(cd /source/directory && tar cf - . ) | (cd /dest/directory && tar xpvf -) #从一个目录移动整个目录树到另一个目录。mv不就好了，这里只是告诉我们这种用法
+
+怎么在文件的开头添加几行？
+file=data.txt
+title="***This is the title line of data text file***"
+
+echo $title | cat - $file >$file.new
+# "cat -" 将stdout连接到$file.
+#  最后的结果就是生成了一新文件, 
+#+ 并且成功的将$title的内容附加到了文件的*开头*. 
