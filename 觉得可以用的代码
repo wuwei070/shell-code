@@ -65,6 +65,16 @@ echo $title | cat - $file >$file.new
 #  最后的结果就是生成了一新文件, 
 #+ 并且成功的将$title的内容附加到了文件的*开头*. 
 
+注意$variable事实上只是${variable}的简写形式. 在某些上下文中$variable可能会引起错误, 这时候你就需要用${variable}了
+# 强烈注意, 在赋值的的时候, 等号前后一定不要有空格.
+
+hello="A B  C   D"
+echo $hello   # A B C D
+echo "$hello" # A B  C   D
+# 就象你看到的echo $hello   和    echo "$hello"   将给出不同的结果.
+# ===============================================================
+# 引用一个变量将保留其中的空白, 当然, 如果是变量替换就不会保留了.  “”是弱引用，''是强引用
+
 ``和R=$(cat /etc/redhat-release) 都是命令替换的一种形式
 a=2334
 b=${a/23/BB}             # 将"23"替换成"BB".
@@ -84,3 +94,5 @@ lastarg=${!args}
 # 或:       lastarg=${!#}
 #           (感谢, Chris Monson.)
 # 注意, 不能直接使用 lastarg=${!$#} , 这会产生错误.
+
+
