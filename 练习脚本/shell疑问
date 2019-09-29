@@ -1,0 +1,5 @@
+1. 分配给环境变量的空间是有限的. 创建太多环境变量, 或者给一个环境变量分配太多的空间都会引起错误.
+ash$ eval "`seq 10000 | sed -e 's/.*/export var&=ZZZZZZZZZZZZZZ/'`"
+
+bash$ du
+bash: /usr/bin/du: Argument list too long
