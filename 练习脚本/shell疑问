@@ -3,3 +3,17 @@ ash$ eval "`seq 10000 | sed -e 's/.*/export var&=ZZZZZZZZZZZZZZ/'`"
 
 bash$ du
 bash: /usr/bin/du: Argument list too long
+
+一个if/then结构可以包含嵌套的比较操作和条件判断操作.  没看懂啥意思
+
+  1 if echo "Next *if* is part of the comparison for the first *if*."
+  2 
+  3   if [[ $comparison = "integer" ]]
+  4     then (( a < b ))
+  5   else
+  6     [[ $a < $b ]]
+  7   fi
+  8 
+  9 then
+ 10   echo '$a is less than $b'
+ 11 fi
