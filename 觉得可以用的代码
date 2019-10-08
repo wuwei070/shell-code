@@ -134,3 +134,15 @@ root@LAPTOP-7RN4GA8H:~# cat >> 1.txt << EOF
 > AAA
 > BBB
 > EOF
+
+if cmp a b &> /dev/null; then
+  echo "Files a and b are identical."
+else
+  echo "Files a and b differ."
+fi 
+
+# 非常有用的"if-grep"结构:
+# ------------------------
+if grep -q Bash file
+then echo "File contains at least one occurrence of Bash."
+fi
