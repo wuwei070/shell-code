@@ -17,3 +17,5 @@ bash: /usr/bin/du: Argument list too long
   9 then
  10   echo '$a is less than $b'
  11 fi
+
+ -h -L 这2个文件判断条件有啥区别

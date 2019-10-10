@@ -5,3 +5,4 @@
 
 let "1<2" returns 0 (as "1<2" expands to "1")
 (( 0 && 1 )) returns 1 (as "0 && 1" expands to "0") # (( ... ))和let ...结构也能够返回退出状态码, 当它们所测试的算术表达式的结果为非零的时候, 将会返回退出状态码0. (不知道为啥要这样)
+find "somedir" -type l -print0| xargs -r0 file| grep "broken symbolic"| sed -e 's/^\|: *broken symbolic.*$/"/g' print0和xargs的-0是配合使用的; 但在某些情况下，如果没有要处理的内容，你可能希望停止 xargs；如果是这样，能使用 -r 选项; sed -e 's/^\|: *broken symbolic.*$/"/g' 管道符|是或的关系，表示开头或者后面匹配到的替换成双引号"
