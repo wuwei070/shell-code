@@ -418,3 +418,78 @@ Bash不能够处理浮点运算. 它会把包含小数点的数字看作字符�
  echo "base-64 number = $b64"             # 4031
  # 这个表示法只能工作于受限的ASCII字符范围(2 - 64).
  # 10个数字 + 26个小写字母 + 26个大写字符 + @ + _
+ 检查$BASH_VERSION对于判断系统上到底运行的是哪个shell来说是一种非常好的方法. 变量$SHELL有时候不能够给出正确的答案.
+ $IFS
+内部域分隔符
+
+这个变量用来决定Bash在解释字符串时如何识别域, 或者单词边界.
+
+$IFS默认为空白(空格, 制表符,和换行符), 但这是可以修改的, 比如, 在分析逗号分隔的数据文件时, 
+就可以设置为逗号. 注意$*使用的是保存在$IFS中的第一个字符. 
+  bash -c 'set w x y z; IFS=":-;"; echo "$*"'
+
+(shopt -s dotglob; rm -f *) #可以删除显示和隐藏的文件
+
+$TMOUT
+如果$TMOUT环境变量被设置为非零值time的话, 那么经过time秒后, shell提示符将会超时. 这将会导致登出(logout).
+
+在2.05b版本的Bash中, $TMOUT变量与命令read可以在脚本中结合使用.
+
+  1 # 只能够在Bash脚本中使用, 必须使用2.05b或之后版本的Bash.
+  2 
+  3 TMOUT=3    # 提示输入时间为3秒.
+  4 
+  5 echo "What is your favorite song?"
+  6 echo "Quickly now, you only have $TMOUT seconds to answer!"
+  7 read song
+  8 
+  9 if [ -z "$song" ]
+ 10 then
+ 11   song="(no answer)"
+ 12   # 默认响应.
+ 13 fi
+ 14 
+ 15 echo "Your favorite song is $song."
+
+ $*
+所有的位置参数都被看作为一个单词.
+
+Note	
+"$*"必须被引用起来.
+
+$@
+与$*相同, 但是每个参数都是一个独立的引用字符串, 这就意味着, 参数是被完整传递的, 并没有被解释或扩展. 这也意味着, 参数列表中每个参数都被看作为单独的单词.
+
+Note	
+当然, "$@"应该被引用起来.
+
+$@与$*中的参数只有在被双引号引用起来的时候才会不同.
+
+$-
+传递给脚本的标记(使用set命令). 参见例子 11-15.
+$_
+这个变量保存之前执行的命令的最后一个参数的值.
+$!
+运行在后台的最后一个作业的PID(进程ID)
+  1 LOG=$0.log
+  2 
+  3 COMMAND1="sleep 100"
+  4 
+  5 echo "Logging PIDs background commands for script: $0" >> "$LOG"
+  6 # 所以它们是可以被监控的, 并且可以在必要的时候kill掉它们.
+  7 echo >> "$LOG"
+  8 
+  9 # 记录命令.
+ 10 
+ 11 echo -n "PID of \"$COMMAND1\":  " >> "$LOG"
+ 12 ${COMMAND1} &
+ 13 echo $! >> "$LOG"
+ 14 # "sleep 100"的PID:  1506
+ 15 
+ 16 # 感谢, Jacques Lederer, 对此的建议.
+
+$?
+命令, 函数, 或者是脚本本身的(参见例子 23-7)退出状态码
+
+$$
+脚本自身的进程ID. $$变量在脚本中经常用来构造"唯一的"临时文件名，这么做通常比调用mktemp命令来的简单.

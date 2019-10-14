@@ -19,3 +19,5 @@ bash: /usr/bin/du: Argument list too long
  11 fi
 
  -h -L 这2个文件判断条件有啥区别
+ trap 怎么用？ https://blog.csdn.net/carolzhang8406/article/details/46504415
+ stty怎么用？
