@@ -969,3 +969,236 @@ ${!varprefix*}, ${!varprefix@}
 [1]	
 如果在一个非交互脚本中, $parameter被设置为null的话, 那么这个脚本将会返回127作为退出状态码(127返回码对应的Bash错误码为命令未发现"command not found").
 
+declare或者typeset内建命令(这两个命令是完全一样的)允许指定变量的具体类型
+declare/typeset选项
+
+-r 只读
+-i 整型
+如果把一个变量指定为整型的话, 那么即使没有expr或者let命令, 也允许使用特定的算术运算.
+
+  4 declare -i n
+  5 n=6/3
+  6 echo "n = $n"       # n = 2
+
+-a 数组
+-f 函数
+如果在脚本中使用declare -f, 而不加任何参数的话, 那么将会列出这个脚本之前定义的所有函数.
+
+  1 declare -f function_name
+如果在脚本中使用declare -f function_name这种形式的话, 将只会列出这个函数的名字.测试是会打印整个函数。
+
+-x export
+  1 declare -x var3
+这句将会声明一个变量, 并作为这个脚本的环境变量被导出.
+
+-x var=$value
+  1 declare -x var3=373
+declare命令允许在声明变量类型的同时给变量赋值.
+
+使用declare内建命令可以限制变量的作用域.
+
+  1 foo ()
+  2 {
+  3 FOO="bar"
+  4 }
+  5 
+  6 bar ()
+  7 {
+  8 foo
+  9 echo $FOO
+ 10 }
+ 11 
+ 12 bar   # 打印bar. 
+然而 . . .
+
+  1 foo (){
+  2 declare FOO="bar"
+  3 }
+  4 
+  5 bar ()
+  6 {
+  7 foo
+  8 echo $FOO
+  9 }
+ 10 
+ 11 bar  # 什么都不打印.
+ 12 
+ 13 
+ 14 # 感谢, Michael Iatrou, 指出这点. 
+
+
+ 变量的间接引用到底有什么应用价值? 它给Bash添加了一种类似于C语言指针的功能, 比如, 在表格查找中的用法. 另外, 
+ 还有一些其他非常有趣的应用. . . .
+
+ $RANDOM: 产生随机整数
+$RANDOM是Bash的内部函数 (并不是常量), 这个函数将返回一个伪随机 [1] 整数, 范围在0 - 32767之间. 
+它不应该被用来产生密匙.
+
+在一个指定范围内产生随机数.
+
+  1 #  在6 到 30之间产生随机数.
+  2    rnumber=$((RANDOM%25+6))	
+  3 
+  4 #  还是在6 - 30之间产生随机数,
+  5 #+ 但是这个数还必须能够被3整除.
+  6    rnumber=$(((RANDOM%30/3+1)*3))
+  7 
+  8 #  注意, 并不是在所有情况下都能正确运行.
+  9 #  如果$RANDOM返回0, 那么就会失败.
+ 10 
+ 11 #  Frank Wang 建议用下边的方法:
+ 12    rnumber=$(( RANDOM%27/3*3+6 ))
+
+rnumber=$(((RANDOM%(max-min+divisibleBy))/divisibleBy*divisibleBy+min))
+这里Bill展示了一个通用公式, 这个函数返回两个指定值之间的随机数.
+
+dev/urandom设备文件提供了一种比单独使用$RANDOM更好的, 能够产生更加"随机"的随机数的方法. 
+dd if=/dev/urandom of=targetfile bs=1 count=XX能够产生一个很分散的伪随机数序列. 然而, 如果想要将这个数赋值到
+一个脚本文件的变量中, 还需要可操作性, 比如使用od命令 (就像上边的例子, 还有例子 12-13), 或者使用dd命令 
+(参见例子 12-55), 或者通过管道传递到md5sum命令中 (参见例子 33-14).
+当然还有其他的产生伪随机数的方法. awk就能提供一个方便的方法来做到这点.
+
+ 37 (( t = a<45?7:11 ))   # C语言风格的三元操作.
+ 38 echo "If a < 45, then t = 7, else t = 11."
+ 39 echo "t = $t "        # Yes!
+
+ 例子 10-2. 每个[list]元素中都带有两个参数的for循环
+
+  1 #!/bin/bash
+  2 # 还是行星.
+  3 
+  4 # 用行星距太阳的距离来分配行星的名字.
+  5 
+  6 for planet in "Mercury 36" "Venus 67" "Earth 93"  "Mars 142" "Jupiter 483"
+  7 do
+  8   set -- $planet  # 解析变量"planet"并且设置位置参数. 
+  9   # "--" 将防止$planet为空, 或者是以一个破折号开头. 
+ 10 
+ 11   # 可能需要保存原始的位置参数, 因为它们被覆盖了.
+ 12   # 一种方法就是使用数组.
+ 13   #        original_params=("$@")
+ 14 
+ 15   echo "$1		$2,000,000 miles from the sun"
+ 16   #-------two  tabs---把后边的0和2连接起来
+ 17 done
+ 18 
+ 19 # (感谢, S.C., 对此问题进行的澄清.)
+ 20 
+ 21 exit 0
+
+ 例子 10-3. 文件信息: 对包含在变量中的文件列表进行操作
+
+  1 #!/bin/bash
+  2 # fileinfo.sh
+  3 
+  4 FILES="/usr/sbin/accept
+  5 /usr/sbin/pwck
+  6 /usr/sbin/chroot
+  7 /usr/bin/fakefile
+  8 /sbin/badblocks
+  9 /sbin/ypbind"     # 这是你所关心的文件列表.
+ 10                   # 扔进去一个假文件, /usr/bin/fakefile.
+ 11 
+ 12 echo
+ 13 
+ 14 for file in $FILES
+ 15 do
+ 16 
+ 17   if [ ! -e "$file" ]       # 检查文件是否存在.
+ 18   then
+ 19     echo "$file does not exist."; echo
+ 20     continue                # 继续下一个.
+ 21    fi
+ 22 
+ 23   ls -l $file | awk '{ print $9 "         file size: " $5 }'  # 打印两个域.
+ 24   whatis `basename $file`   # 文件信息.
+ 25   # 注意whatis数据库需要提前建立好.
+ 26   # 要想达到这个目的, 以root身份运行/usr/bin/makewhatis.
+ 27   echo
+ 28 done  
+ 29 
+ 30 exit 0
+
+ 在一个for循环中忽略in [list]部分的话, 将会使循环操作$@ -- 从命令行传递给脚本的位置参数. 一个非常好的例子, 参见例子 A-16. 参见例子 11-16.
+
+例子 10-5. 在for循环中省略in [list]部分
+
+  1 #!/bin/bash
+  2 
+  3 #  使用两种方式来调用这个脚本, 一种带参数, 另一种不带参数,
+  4 #+ 并观察在这两种情况下, 此脚本的行为.
+  5 
+  6 for a
+  7 do
+  8  echo -n "$a "
+  9 done
+ 10 
+ 11 #  省略'in list'部分, 因此循环将会操作'$@'
+ 12 #+ (包括空白的命令行参数列表).
+ 13 
+ 14 echo
+ 15 
+ 16 exit 0
+也可以使用命令替换 来产生for循环的[list]. 
+
+例子 10-6. 使用命令替换来产生for循环的[list]
+
+  1 #!/bin/bash
+  2 #  for-loopcmd.sh: 带[list]的for循环, 
+  3 #+ [list]是由命令替换所产生的.
+  4 
+  5 NUMBERS="9 7 3 8 37.53"
+  6 
+  7 for number in `echo $NUMBERS`  # for number in 9 7 3 8 37.53
+  8 do
+  9   echo -n "$number "
+ 10 done
+ 11 
+ 12 echo 
+ 13 exit 0
+
+ 29 # 让我们使用C语言的"逗号操作符", 来同时增加两个变量的值. 
+ 30 
+ 31 for ((a=1, b=1; a <= LIMIT ; a++, b++))  # 逗号将同时进行两条操作.
+ 32 do
+ 33   echo -n "$a-$b "
+ 34 done
+ 35 
+ 36 echo; echo
+
+例子 10-17. C风格的while循环
+
+  1 #!/bin/bash
+  2 # wh-loopc.sh: 循环10次的"while"循环.
+  3 
+  4 LIMIT=10
+  5 a=1
+  6 
+  7 while [ "$a" -le $LIMIT ]
+  8 do
+  9   echo -n "$a "
+ 10   let "a+=1"
+ 11 done           # 到目前为止都没有什么令人惊奇的地方.
+ 12 
+ 13 echo; echo
+ 14 
+ 15 # +=================================================================+
+ 16 
+ 17 # 现在, 重复C风格的语法.
+ 18 
+ 19 ((a = 1))      # a=1
+ 20 # 双圆括号允许赋值两边的空格, 就像C语言一样.
+ 21 
+ 22 while (( a <= LIMIT ))   # 双圆括号, 变量前边没有"$".
+ 23 do
+ 24   echo -n "$a "
+ 25   ((a += 1))   # let "a+=1"
+ 26   # Yes, 看到了吧.
+ 27   # 双圆括号允许像C风格的语法一样增加变量的值.
+ 28 done
+ 29 
+ 30 echo
+ 31 
+ 32 # 现在, C程序员可以在Bash中找到回家的感觉了吧.
+ 33 
+ 34 exit 0
