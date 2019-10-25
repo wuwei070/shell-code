@@ -1204,6 +1204,6 @@ dd if=/dev/urandom of=targetfile bs=1 count=XX能够产生一个很分散的伪�
  34 exit 0
 
  break命令可以带一个参数. 一个不带参数的break命令只能退出最内层的循环, 而break N可以退出N层循环.
-
- continue命令也可以象break命令一样带一个参数. 一个不带参数的continue命令只会去掉本次循环的剩余代码. 
+ 
+  continue命令也可以象break命令一样带一个参数. 一个不带参数的continue命令只会去掉本次循环的剩余代码. 
  而continue N将会把N层循环的剩余代码都去掉, 但是循环的次数不变.
